@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(36), unique=True, primary_key=True)
-    login = db.Column(db.String(30), nullable=False)
+    login = db.Column(db.String(30), nullable=False, unique=True)
     password = db.Column(db.String(30), nullable=False)
     task_count = db.Column(db.TEXT, default="[]")
 
@@ -25,20 +25,29 @@ def register_userDB(login, password):
     return token
 
 
-def login_user(login, password):
-    pass
+def login_userDB(login, password):
+    user = User.query.fillter_by(login=login).first()
+    if user.password == password:
+        return user.id
+    else:
+        return None
 
 
-@app.route('/login', methods=["POST"])
-def login(username, password):
-    token = login(username, password)
+@app.route('/login', methods=['POST'])
+def login():
+    req_json = request.get_json()
+    token = login_userDB(req_json['login'], req_json['password'])
+    if token is not None:
+        return json.dumps({'token': token }, indent=4)
+    else:
+        return json.dumps({'error': 'login was failed'}, indent=4)
 
 
 @app.route('/register', methods=['POST'])
 def register_user():
     req_json = request.get_json()
     d = {'token' : register_userDB(req_json["login"], req_json["password"])}
-    return json.dumps(d, indent=10)
+    return json.dumps(d, indent=4)
 
 
 @app.route('/time', methods=["GET"])
