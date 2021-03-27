@@ -6,6 +6,7 @@ import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///SexHack.db'
+app.config['SERVER_NAME'] = '0.0.0.0'
 db = SQLAlchemy(app)
 
 
@@ -26,8 +27,7 @@ def register_user(login, password):
 
 
 def login_user(login, password):
-    db.query_expression
-
+    pass
 
 
 @app.route('/login/login=<login>&password=<password>', methods=["POST"])
