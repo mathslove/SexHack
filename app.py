@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///SexHack.db'
-app.config['SERVER_NAME'] = '0.0.0.0'
+app.config['SERVER_NAME'] = '0.0.0.0:5001'
 db = SQLAlchemy(app)
 
 
