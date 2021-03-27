@@ -28,7 +28,8 @@ def register_userDB(login, password):
         return token
     except Exception as e:
         db.session.rollback()
-        print(e)
+        print(e, file=open("debug.txt", "w"))
+        return None
 
 
 def login_userDB(login, password):
@@ -56,7 +57,7 @@ def register_user():
     if token is not None:
         return json.dumps({'token', token}, indent=4)
     else:
-        return json.dumps({'error': 'login was failed'}, indent=4)
+        return json.dumps({'error': 'register was failed'}, indent=4)
 
 
 @app.route('/time', methods=["GET"])
