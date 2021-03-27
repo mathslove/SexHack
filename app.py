@@ -1,12 +1,11 @@
 from datetime import datetime
-from flask import Flask
+from flask import Flask, request
 import uuid
 from flask_sqlalchemy import SQLAlchemy
 import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///SexHack.db'
-app.config['SERVER_NAME'] = '0.0.0.0:5001'
 db = SQLAlchemy(app)
 
 
@@ -18,26 +17,28 @@ class User(db.Model):
     task_count = db.Column(db.TEXT, default="[]")
 
 
-def register_user(login, password):
+def register_userDB(login, password):
     user = User(id=str(uuid.uuid4()), login=login, password=password)
-    db.session.add()
+    db.session.add(user)
     db.session.commit()
-    d = {'Token', str(user.id)}
-    return "{ 'Token' = '{}'}".format(str(user.id))
+    token = str(user.id)
+    return token
 
 
 def login_user(login, password):
     pass
 
 
-@app.route('/login/login=<login>&password=<password>', methods=["POST"])
-def login(login, password):
-    token = login(login, password)
+@app.route('/login', methods=["POST"])
+def login(username, password):
+    token = login(username, password)
 
 
-@app.route('/register/login=<login>&password=<password>', methods=["POST"])
-def register_user(login, password):
-    register_user(login, password)
+@app.route('/register', methods=['POST'])
+def register_user(username, password):
+    req_json = request.get_json()
+    print(req_json, file=open("debug.txt", "w"))
+    # return register_userDB(username, password)
 
 
 @app.route('/time', methods=["GET"])
