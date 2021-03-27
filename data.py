@@ -25,7 +25,7 @@ class users:
         self.cursor = self.parent.cursor()
         self.insSign = ", ".join(signature.info.keys())
 
-        self.cursor.execute(f"CREATE TABLE IF NOT EXISTS users(login, password, uuid);")
+        self.cursor.execute(f"CREATE TABLE IF NOT EXISTS users(login UNIQUE, password, uuid);")
         self.parent.commit()
 
     def update(self):
@@ -56,6 +56,7 @@ class users:
             print(request)
 
 
+"""
 class tasks:
     def __init__(self, parentDB, signature):
         self.parent = parentDB
@@ -76,11 +77,11 @@ class tasks:
     def update(self):
         self.cursor.execute("DROP TABLE IF EXISTS tasks")
         self.parent.commit()
+"""
 
 
 conn = sqlite3.connect('test.sqlite')
-
-#usersDB = users(conn, user("", ""))
+usersDB = users(conn, user("", ""))
 
 #usersDB.addUser(user("lolilover", "123"))
-#usersDB.LogIn("vas9", "kamen")
+usersDB.LogIn("vas9", "kamen")
