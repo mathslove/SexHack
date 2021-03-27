@@ -1,4 +1,6 @@
 from datetime import datetime
+from sqlite3 import IntegrityError
+
 from flask import Flask, request
 import uuid
 from flask_sqlalchemy import SQLAlchemy
@@ -18,15 +20,19 @@ class User(db.Model):
 
 
 def register_userDB(login, password):
-    user = User(id=str(uuid.uuid4()), login=login, password=password)
-    db.session.add(user)
-    db.session.commit()
-    token = str(user.id)
-    return token
+    try:
+        user = User(id=str(uuid.uuid4()), login=login, password=password)
+        db.session.add(user)
+        db.session.commit()
+        token = str(user.id)
+        return token
+    except Exception as e:
+        db.session.rollback()
+        print(e)
 
 
 def login_userDB(login, password):
-    user = User.query.fillter_by(login=login).first()
+    user = User.query.filter_by(login=login).first()
     if user.password == password:
         return user.id
     else:
@@ -46,8 +52,11 @@ def login():
 @app.route('/register', methods=['POST'])
 def register_user():
     req_json = request.get_json()
-    d = {'token' : register_userDB(req_json["login"], req_json["password"])}
-    return json.dumps(d, indent=4)
+    token = register_userDB(req_json["login"], req_json["password"])
+    if token is not None:
+        return json.dumps({'token', token}, indent=4)
+    else:
+        return json.dumps({'error': 'login was failed'}, indent=4)
 
 
 @app.route('/time', methods=["GET"])
