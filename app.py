@@ -35,10 +35,9 @@ def login(username, password):
 
 
 @app.route('/register', methods=['POST'])
-def register_user(username, password):
+def register_user():
     req_json = request.get_json()
-    print(req_json, file=open("debug.txt", "w"))
-    # return register_userDB(username, password)
+    return register_userDB(req_json["login"], req_json["password"])
 
 
 @app.route('/time', methods=["GET"])
