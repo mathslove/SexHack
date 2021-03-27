@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Flask
 import uuid
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///SexHack.db'
@@ -20,10 +21,12 @@ def register_user(login, password):
     user = User(id=str(uuid.uuid4()), login=login, password=password)
     db.session.add()
     db.session.commit()
+    d = {'Token', str(user.id)}
+    return "{ 'Token' = '{}'}".format(str(user.id))
 
 
 def login_user(login, password):
-    pass
+    db.query_expression
 
 
 
