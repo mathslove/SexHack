@@ -55,7 +55,7 @@ def register_user():
     req_json = request.get_json()
     token = register_userDB(req_json["login"], req_json["password"])
     if token is not None:
-        return json.dumps({'token', token}, indent=4)
+        return json.dumps({'token': token}, indent=4)
     else:
         return json.dumps({'error': 'register was failed'}, indent=4)
 
