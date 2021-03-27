@@ -37,7 +37,8 @@ def login(username, password):
 @app.route('/register', methods=['POST'])
 def register_user():
     req_json = request.get_json()
-    return register_userDB(req_json["login"], req_json["password"])
+    d = {'token' : register_userDB(req_json["login"], req_json["password"])}
+    return json.dumps(d, indent=10)
 
 
 @app.route('/time', methods=["GET"])
