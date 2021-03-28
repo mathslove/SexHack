@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlite3 import IntegrityError
 
-from flask import Flask, request
+from flask import Flask, request, send_file
 import uuid
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -17,6 +17,23 @@ class User(db.Model):
     login = db.Column(db.String(30), nullable=False, unique=True)
     password = db.Column(db.String(30), nullable=False)
     task_count = db.Column(db.TEXT, default="[]")
+
+
+class Theme(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)
+    theme = db.Column(db.TEXT, nullable=False)
+    jpeg_link = db.Column(db.TEXT)
+    tasks = db.relationship('Task', backref='theme', lazy=True)
+
+
+class Task(db.Model):
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)
+    task_json = db.Column(db.TEXT)
+    jpeg_link = db.Column(db.TEXT)
+    is_public = db.Column(db.BOOLEAN, default=True)
+    theme_id = db.Column(db.TEXT, nullable=False)
+    inner_order = db.Column(db.Integer, nullable=False)
 
 
 def register_userDB(login, password):
@@ -40,6 +57,17 @@ def login_userDB(login, password):
         return None
 
 
+def add_taskDB(json_path, theme_id, inner_order, is_public=True, jpeg_path=None):
+    try:
+        json_f = open(json_path, "r")
+
+        task = Task(task_json=json_f.read(), theme_id=theme, inner_order=inner_order,
+                    is_public=is_public, jpeg_link=jpeg_path)
+        return True
+    except Exception as e:
+        return False
+
+
 @app.route('/login', methods=['POST'])
 def login():
     req_json = request.get_json()
@@ -58,6 +86,17 @@ def register_user():
         return json.dumps({'token': token}, indent=4)
     else:
         return json.dumps({'error': 'register was failed'}, indent=4)
+
+
+@app.route('/themes', methods=['POST'])
+def get_all_themes():
+    themes = Theme.query.all()
+    d = {}
+    for theme in themes:
+        d[theme.theme] = dict()
+        d[theme.theme]["id"] = theme.id
+        d[theme.theme]["jpeg_link"] = send_file(theme.jpeg_link)
+    return json.dumps(d, indent=4)
 
 
 @app.route('/time', methods=["GET"])
