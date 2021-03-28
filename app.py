@@ -33,7 +33,7 @@ class Task(db.Model):
     task_json = db.Column(db.TEXT)
     jpeg_link = db.Column(db.TEXT)
     is_public = db.Column(db.BOOLEAN, default=True)
-    theme_id = db.Column(db.TEXT, nullable=False)
+    theme_id = db.Column(db.TEXT, db.ForeignKey('theme.id'), nullable=False)
     inner_order = db.Column(db.Integer, nullable=False)
 
 
