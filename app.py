@@ -58,12 +58,24 @@ def login_userDB(login, password):
         return None
 
 
+def add_themeDB(theme, jpeg_link):
+    try:
+        theme = Theme(theme=theme, jpeg_link=jpeg_link)
+        db.session.add(theme)
+        db.session.commit()
+        return True
+    except Exception as e:
+        return False
+
+
 def add_taskDB(json_path, theme_id, inner_order, is_public=True, jpeg_path=None):
     try:
         json_f = open(json_path, "r")
 
-        task = Task(task_json=json_f.read(), theme_id=theme, inner_order=inner_order,
+        task = Task(task_json=json_f.read(), theme_id=theme_id, inner_order=inner_order,
                     is_public=is_public, jpeg_link=jpeg_path)
+        db.session.add(task)
+        db.session.commit()
         return True
     except Exception as e:
         return False
