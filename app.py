@@ -1,6 +1,8 @@
 from datetime import datetime
 from sqlite3 import IntegrityError
-
+import os
+from pathlib import Path
+import shutil
 from flask import Flask, request, send_file
 import uuid
 from flask_sqlalchemy import SQLAlchemy
@@ -8,7 +10,10 @@ import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///SexHack.db'
+resource = r"C:\Users\mmas6\PycharmProjects\SexHack\resource"
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/mika/resources/data/SexHack.db'
+# resource = r"/home/mika/resources"
+
 db = SQLAlchemy(app)
 
 
@@ -22,7 +27,7 @@ class User(db.Model):
 
 class Theme(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)
-    theme = db.Column(db.TEXT, nullable=False)
+    theme = db.Column(db.TEXT, nullable=False, unique=True)
     jpeg_link = db.Column(db.TEXT)
     tasks = db.relationship('Task', backref='theme', lazy=True)
 
@@ -58,13 +63,21 @@ def login_userDB(login, password):
         return None
 
 
-def add_themeDB(theme, jpeg_link):
+def add_themeDB(themeVal, img_link):
     try:
-        theme = Theme(theme=theme, jpeg_link=jpeg_link)
-        db.session.add(theme)
+        themeT = Theme(theme=themeVal, jpeg_link=None)
+        db.session.add(themeT)
         db.session.commit()
+
+        themeT = Theme.query.filter_by(theme=themeVal).first()
+        res = str(Path(resource).joinpath("theme-{}.jpg".format(themeT.id)))
+        shutil.copyfile(img_link, res)
+        Theme.query.filter_by(theme=themeVal).update({'jpeg_link': res})
+        db.session.commit()
+
         return True
     except Exception as e:
+        print(e)
         return False
 
 
@@ -101,15 +114,22 @@ def register_user():
         return json.dumps({'error': 'register was failed'}, indent=4)
 
 
-@app.route('/themes', methods=['POST'])
+@app.route('/themes', methods=['GET'])
 def get_all_themes():
     themes = Theme.query.all()
     d = {}
     for theme in themes:
         d[theme.theme] = dict()
         d[theme.theme]["id"] = theme.id
-        d[theme.theme]["jpeg_link"] = send_file(theme.jpeg_link)
+        d[theme.theme]["jpeg_link"] = "/download/{}".format(theme.jpeg_link)
+    print(d)
+    print(json.dumps(d, indent=4))
     return json.dumps(d, indent=4)
+
+
+@app.route('/download/<filename>', methods=["GET"])
+def download(filename):
+    return send_file(Path(resource).joinpath(filename))
 
 
 @app.route('/time', methods=["GET"])
