@@ -8,6 +8,7 @@ import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///SexHack.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/mika/resources/data/SexHack.db'
 db = SQLAlchemy(app)
 
 
@@ -106,3 +107,4 @@ def time_check():
 
 if __name__ == '__main__':
     app.run()
+    # app.run(host="0.0.0.0")
