@@ -57,7 +57,7 @@ def register_userDB(login, password):
 
 def login_userDB(login, password):
     user = User.query.filter_by(login=login).first()
-    if user.password == password:
+    if user is not None and user.password == password:
         return user.id
     else:
         return None
@@ -70,9 +70,9 @@ def add_themeDB(themeVal, img_link):
         db.session.commit()
 
         themeT = Theme.query.filter_by(theme=themeVal).first()
-        res = str(Path(resource).joinpath("theme-{}.jpg".format(themeT.id)))
-        shutil.copyfile(img_link, res)
-        Theme.query.filter_by(theme=themeVal).update({'jpeg_link': res})
+        res = Path(resource).joinpath("theme-{}.jpg".format(themeT.id))
+        shutil.copyfile(img_link, str(res))
+        Theme.query.filter_by(theme=themeVal).update({'jpeg_link': res.name})
         db.session.commit()
 
         return True
