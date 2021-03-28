@@ -42,16 +42,16 @@ class Task(db.Model):
     inner_order = db.Column(db.Integer, nullable=False)
 
 
-def register_userDB(login, password):
+def register_userDB(username, password):
     try:
-        user = User(id=str(uuid.uuid4()), login=login, password=password)
+        user = User(id=str(uuid.uuid4()), login=username, password=password)
         db.session.add(user)
         db.session.commit()
         token = str(user.id)
         return token
     except Exception as e:
         db.session.rollback()
-        print(e, file=open("debug.txt", "w"))
+        print(datetime.now(), e, file=open("debug.txt", "w"))
         return None
 
 
@@ -101,7 +101,7 @@ def login():
     if token is not None:
         return json.dumps({'token': token }, indent=4)
     else:
-        return json.dumps({'error': 'login was failed'}, indent=4)
+        return json.dumps({'error': 'Login was failed'}, indent=4)
 
 
 @app.route('/register', methods=['POST'])
@@ -111,7 +111,7 @@ def register_user():
     if token is not None:
         return json.dumps({'token': token}, indent=4)
     else:
-        return json.dumps({'error': 'register was failed'}, indent=4)
+        return json.dumps({'error': 'Register was failed'}, indent=4)
 
 
 @app.route('/themes', methods=['GET'])
