@@ -5,8 +5,8 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
-import models
-migration = Migrate(app, models.db)
+from models import *
+migration = Migrate(app, db)
 
 from views import *
 

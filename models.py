@@ -26,6 +26,7 @@ class Theme(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)
     theme = db.Column(db.TEXT, nullable=False, unique=True)
     svg_link = db.Column(db.TEXT)
+    subscription = db.Column(db.Enum('level_0', 'level_1', 'level_2', 'level_3'))
     tasks = db.relationship('Task', backref='themes', lazy=True)
 
 
