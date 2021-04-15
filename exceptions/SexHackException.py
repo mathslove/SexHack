@@ -1,0 +1,2 @@
+class SexHackException(Exception):
+    pass
